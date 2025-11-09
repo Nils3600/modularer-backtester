@@ -148,10 +148,7 @@ def run_live():
     timeframe = timeframe_map.get(timeframe_input.upper(), mt5.TIMEFRAME_H1)
     print(f"✅ Konfig: {symbol} auf {timeframe_input}")
     
-    # 3. Test-Modus abfragen
-    test_mode = input("🧪 Test-Modus (keine realen Orders)? (y/n): ").strip().lower() == 'y'
-    if test_mode:
-        print("⚠️ Test-Modus aktiviert: Nur Simulation, keine MT5-Orders.")
+
     
     # 4. LiveTrader initialisieren und starten
     try:
@@ -162,16 +159,8 @@ def run_live():
         signal.signal(signal.SIGINT, signal_handler)  # Ctrl+C-Handler
         
         print(f"\n🔄 Starte LiveTrader-Loop für {symbol}...")
-        if test_mode:
-            # Simuliere mit historischen Daten (optional CSV laden)
-            csv_path = input("📁 CSV für Simulation (optional): ").strip()
-            if csv_path and os.path.exists(csv_path):
-                df = load_data.metatrader_csv(csv_path)
-                trader.df = df  # Für Indikator-Berechnung
-                print("✅ Simulation mit CSV-Daten gestartet.")
-            trader.start_loop()  # Passe an: In Test-Modus ohne MT5
-        else:
-            trader.start_loop()
+
+        trader.start_loop()
             
     except Exception as e:
         print(f"❌ Fehler beim Starten: {e}")
