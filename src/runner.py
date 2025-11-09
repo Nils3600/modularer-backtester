@@ -153,8 +153,8 @@ def run_live():
     # 4. LiveTrader initialisieren und starten
     try:
         trader = LiveTrader(strategy, symbol=symbol, timeframe=timeframe)
-        if not test_mode:
-            trader.connect()  # MT5-Verbindung nur im Live-Modus
+        
+        trader.connect()  # MT5-Verbindung nur im Live-Modus
         
         signal.signal(signal.SIGINT, signal_handler)  # Ctrl+C-Handler
         
