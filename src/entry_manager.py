@@ -64,7 +64,7 @@ class EntryManager:
     
     
     
-        # 🚧 Trailing-Stop Logik
+        # Trailing-Stop Logik
         if trail_active:
             trail_value = trailing.get("distance", 50) / 100000
             current_trailing_sl = position.get("sl_trailing")
@@ -96,7 +96,7 @@ class EntryManager:
                 )
                 position["sl_trailing"] = new_sl
     
-            # ⛔ SL verletzt?
+            # SL verletzt?
             effective_sl = position.get("sl_trailing")
             if (type_ == "buy" and price <= effective_sl) or (type_ == "sell" and price >= effective_sl):
                 position["exit_reason"] = "trailing_stop"
@@ -105,7 +105,7 @@ class EntryManager:
     
     
         else:
-            # 🧱 Klassischer SL
+            # Klassischer SL
             sl_price = entry - sl_pips / 100000 if type_ == "buy" else entry + sl_pips / 100000
             if (type_ == "buy" and price <= sl_price) or (type_ == "sell" and price >= sl_price):
                 position["exit_reason"] = "stop_loss"
@@ -114,7 +114,7 @@ class EntryManager:
     
     
     
-        # 🎯 TP
+        # TP
         if (type_ == "buy" and price >= tp_price) or (type_ == "sell" and price <= tp_price):
             position["exit_reason"] = "take_profit"
             position["exit_price"] = market_close or price
@@ -122,7 +122,7 @@ class EntryManager:
     
     
     
-        # ⚔️ Gegensignal
+        # Gegensignal
         if self.exit_config.get("use_opposite_signal") and current_signal:
             is_opposite = (type_ == "buy" and current_signal == "sell") or (type_ == "sell" and current_signal == "buy")
             if is_opposite:
@@ -132,7 +132,7 @@ class EntryManager:
     
     
     
-        # 📘 Logikmasken
+        # Logikmasken
         for logic in self.exit_config.get("logic", []):
             parser = StrategyLogicParser(rule_results)
             mask = parser.parse_expression(logic["when"])
