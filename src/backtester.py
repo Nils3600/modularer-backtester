@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 from tqdm import tqdm
 from strategy_core import _resolve_indicator,_resolve_trigger, evaluate_rules, evaluate_signals
-from strategy_logic import StrategyLogicParser
 from entry_manager import EntryManager
 
 

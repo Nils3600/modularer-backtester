@@ -1,0 +1,67 @@
+{
+  "strategy": {
+    "name": "rsi_reversal_breakout_v1",
+    "description": "Strategie basierend auf RSI-Überkauft/Überverkauft und Trendbestätigung",
+    "start balance": 10000,
+    "rpt": 0.02,
+    "lever": 300,
+    "rules": [
+      {
+        "id": "R1",
+        "left": {
+          "indicator": "rsi",
+          "params": { "period": 14 }
+        },
+        "right": 30,
+        "trigger": "crosses_above"
+      },
+      {
+        "id": "R2",
+        "left": {
+          "indicator": "rsi",
+          "params": { "period": 14 }
+        },
+        "right": 70,
+        "trigger": "crosses_below"
+      },
+      {
+        "id": "R3",
+        "left": {
+          "indicator": "rsi",
+          "params": { "period": 14 }
+        },
+        "right": 50,
+        "trigger": "above"
+      },
+      {
+        "id": "R4",
+        "left": {
+          "indicator": "rsi",
+          "params": { "period": 14 }
+        },
+        "right": 50,
+        "trigger": "below"
+      }
+    ],
+    "entry_logic": [
+      {
+        "ID": "L1",
+        "signal": "buy",
+        "when": "R1 & R3",
+        "sl": 150,
+        "tp": 400
+      },
+      {
+        "ID": "L2",
+        "signal": "sell",
+        "when": "R2 & R4",
+        "sl": 150,
+        "tp": 400
+      }
+    ],
+    "exit_config": {
+      "use_opposite_signal": true,
+      "logic": []
+    }
+  }
+}

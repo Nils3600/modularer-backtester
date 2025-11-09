@@ -15,14 +15,15 @@ class load_data():
         df = pd.read_csv(
             filepath,
             sep="\t",
-            parse_dates=[[0, 1]],
             names=["Date", "Time", "Open", "High", "Low", "Close", "TickVol", "Vol", "Spread"],
             header=None,
             skiprows=1,
             engine='python'
         )
-        df.rename(columns={"Date_Time": "DateTime"}, inplace=True)
+        
+        df['DateTime'] = pd.to_datetime(df['Date'].astype(str) + ' ' + df['Time'].astype(str))
         df.set_index("DateTime", inplace=True)
+        df.drop(['Date', 'Time'], axis=1, inplace=True)  # Aufräumen
         return df[["Open", "High", "Low", "Close", "TickVol", "Vol", "Spread"]]
         
         

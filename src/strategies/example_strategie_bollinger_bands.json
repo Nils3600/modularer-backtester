@@ -1,0 +1,109 @@
+{ 
+  "strategy": {
+    "name": "bollinger_bounce_breakout_v2",
+    "description": "Strategie mit Bollinger Bändern und erweiterten Triggern für Breakouts und Rebounds",
+    "start balance": 10000,
+    "rpt": 0.02,
+    "lever": 300,
+    
+    "rules": [
+      {
+        "id": "R1",
+        "left": {
+          "indicator": "price",
+          "params": { "field": "Low" }
+        },
+        "right": {
+          "indicator": "bollinger_bands",
+          "params": { "period": 20, "std_dev": 2 },
+          "output": "lower"
+        },
+        "trigger": "crosses_above"
+      },
+      {
+        "id": "R2",
+        "left": {
+          "indicator": "price",
+          "params": { "field": "High" }
+        },
+        "right": {
+          "indicator": "bollinger_bands",
+          "params": { "period": 20, "std_dev": 2 },
+          "output": "upper"
+        },
+        "trigger": "crosses_below"
+      },
+      {
+        "id": "R3",
+        "left": {
+          "indicator": "price",
+          "params": { "field": "Close" }
+        },
+        "right": {
+          "indicator": "bollinger_bands",
+          "params": { "period": 20, "std_dev": 2.5 },
+          "output": "upper"
+        },
+        "trigger": "above"
+      },
+      {
+        "id": "R4",
+        "left": {
+          "indicator": "price",
+          "params": { "field": "Close" }
+        },
+        "right": {
+          "indicator": "bollinger_bands",
+          "params": { "period": 20, "std_dev": 2.5 },
+          "output": "lower"
+        },
+        "trigger": "below"
+      }
+    ],
+
+    "entry_logic": [
+      {
+        "ID": "L1",
+        "signal": "buy",
+        "when": "R1 & ~R2",
+        "sl": 200,
+        "tp": 600
+      },
+      {
+        "ID": "L2",
+        "signal": "sell",
+        "when": "R2 & ~R1",
+        "sl": 200,
+        "tp": 600
+      },
+      {
+        "ID": "L3",
+        "signal": "buy",
+        "when": "R4",
+        "sl": 500,
+        "tp": 2000
+      },
+      {
+        "ID": "L4",
+        "signal": "sell",
+        "when": "R3",
+        "sl": 500,
+        "tp": 2000
+      }
+    ],
+
+    "exit_config": {
+      "use_opposite_signal": true,
+       "logic": [
+         {
+           "ID": "E1",
+           "when": "~R1 & ~R2 & ~R3 & ~R4"
+         }
+       ],
+       "trailing": {
+         "distance": 75,
+         "trigger": "always"  
+       }
+    }
+  }
+}
