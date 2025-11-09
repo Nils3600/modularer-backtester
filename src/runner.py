@@ -6,10 +6,13 @@ Scant ./src/strategies/ nach JSON-Strategien, fragt CSV-Pfad ab und führt Backt
 
 import os
 import json
+import signal
 import pandas as pd
 from pathlib import Path
+import MetaTrader5 as mt5
 from backtester import Backtester
 from load_mt5_data import load_data
+from live_trader import LiveTrader
 from visualizer import ChartPlotter
 import sys
 
@@ -38,7 +41,7 @@ def load_strategies_from_dir(dir_path="./strategies"):
     
     return strategies
 
-def main():
+def run_backtest():
     print("Backtest Runner gestartet!")
     
     # 1. CSV-Pfad abfragen
@@ -101,7 +104,115 @@ def main():
     plotter.plot_trades_2(entry_mgr=bt.entry_mgr, show_equity=True)
     print("✅ Plot gespeichert als 'trade2_plot.html' und geöffnet.")
     
-    print("\n🎉 Backtest abgeschlossen!")
+    print("\n✅ Backtest abgeschlossen!")
+
+def signal_handler(sig, frame):
+    """Graceful Shutdown für Ctrl+C."""
+    print("\n🛑 LiveTrader gestoppt. MT5-Verbindung trennen...")
+    mt5.shutdown()
+    sys.exit(0)
+
+def run_live():
+    print("🚀 Live Trader Runner gestartet!")
+    
+    # 1. Strategien laden und auswählen
+    strategies = load_strategies_from_dir()
+    if not strategies:
+        print("❌ Keine Strategien gefunden. Füge .json-Dateien in ./src/strategies/ hinzu (mit 'strategy'-Schlüssel).")
+        sys.exit(1)
+    
+    print("\nVerfügbare Strategien:")
+    for i, (name, strat) in enumerate(strategies.items(), 1):
+        desc = strat.get("description", "Keine Beschreibung")
+        print(f"{i}. {name}: {desc}")
+    
+    try:
+        choice = int(input("\n🔢 Welche Strategie ausführen? (Nummer): ")) - 1
+        selected_name = list(strategies.keys())[choice]
+        strategy = strategies[selected_name]
+        print(f"✅ Ausgewählte Strategie: {selected_name}")
+    except (ValueError, IndexError):
+        print("❌ Ungültige Auswahl. Beende.")
+        sys.exit(1)
+    
+    # 2. Symbol und Timeframe abfragen
+    symbol = input("📊 Symbol (z.B. EURUSD): ").strip() or "EURUSD"
+    timeframe_input = input("⏱️ Timeframe (z.B. H1, M15): ").strip() or "H1"
+    
+    # Timeframe-Mapping
+    timeframe_map = {
+        "M1": mt5.TIMEFRAME_M1, "M5": mt5.TIMEFRAME_M5, "M15": mt5.TIMEFRAME_M15,
+        "M30": mt5.TIMEFRAME_M30, "H1": mt5.TIMEFRAME_H1, "H4": mt5.TIMEFRAME_H4,
+        "D1": mt5.TIMEFRAME_D1
+    }
+    timeframe = timeframe_map.get(timeframe_input.upper(), mt5.TIMEFRAME_H1)
+    print(f"✅ Konfig: {symbol} auf {timeframe_input}")
+    
+    # 3. Test-Modus abfragen
+    test_mode = input("🧪 Test-Modus (keine realen Orders)? (y/n): ").strip().lower() == 'y'
+    if test_mode:
+        print("⚠️ Test-Modus aktiviert: Nur Simulation, keine MT5-Orders.")
+    
+    # 4. LiveTrader initialisieren und starten
+    try:
+        trader = LiveTrader(strategy, symbol=symbol, timeframe=timeframe)
+        if not test_mode:
+            trader.connect()  # MT5-Verbindung nur im Live-Modus
+        
+        signal.signal(signal.SIGINT, signal_handler)  # Ctrl+C-Handler
+        
+        print(f"\n🔄 Starte LiveTrader-Loop für {symbol}...")
+        if test_mode:
+            # Simuliere mit historischen Daten (optional CSV laden)
+            csv_path = input("📁 CSV für Simulation (optional): ").strip()
+            if csv_path and os.path.exists(csv_path):
+                df = load_data.metatrader_csv(csv_path)
+                trader.df = df  # Für Indikator-Berechnung
+                print("✅ Simulation mit CSV-Daten gestartet.")
+            trader.start_loop()  # Passe an: In Test-Modus ohne MT5
+        else:
+            trader.start_loop()
+            
+    except Exception as e:
+        print(f"❌ Fehler beim Starten: {e}")
+        if 'mt5' in str(e).lower():
+            print("💡 Tipp: Installiere MetaTrader5 via `pip install MetaTrader5` und starte MT5.")
+        sys.exit(1)
+
+def main():
+    print("🚀 Willkommen im Trading-Core CLI!")
+    print("Dieses Tool ermöglicht Backtesting und Live-Trading mit JSON-basierten Strategien.")
+    
+    # Modus-Auswahl mit klarer Anzeige
+    print("\n📋 Verfügbare Modi:")
+    print("1: Backtesting (historische Daten simulieren)")
+    print("2: Live-Trading (MT5-Integration, Demo empfohlen)")
+    
+    while True:  # Loop für bessere UX: Wiederhole bei ungültiger Eingabe
+        user_input = input("\n🔢 Wähle einen Modus (1 oder 2): ").strip()
+        
+        if user_input not in ['1', '2']:
+            print("❌ Ungültige Eingabe! Nur 1 (Backtesting) oder 2 (Live) möglich.")
+            continue  
+        
+        try:
+            if user_input == '1':
+                print("\n🔄 Starte Backtesting-Modus...")
+                run_backtest()  
+                break
+            elif user_input == '2':
+                print("\n🔄 Starte Live-Trading-Modus...")
+                run_live()  
+                break
+        except KeyboardInterrupt:
+            print("\n🛑 Abbruch durch Benutzer. Bis bald!")
+            sys.exit(0)
+        except Exception as e:
+            print(f"❌ Unerwarteter Fehler im Modus {user_input}: {e}")
+            print("💡 Tipp: Überprüfe Abhängigkeiten (z.B. pandas, MetaTrader5).")
+            sys.exit(1)
+    
+    print("\n🎉 Session beendet. Viel Erfolg beim Trading!")
 
 if __name__ == "__main__":
     main()
