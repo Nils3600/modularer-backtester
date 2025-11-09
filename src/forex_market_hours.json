@@ -1,0 +1,62 @@
+{
+  "EURUSD": {
+    "timezone": "UTC",
+    "session": {
+      "Sunday":    ["22:00", "23:59"],
+      "Monday":    ["00:00", "23:59"],
+      "Tuesday":   ["00:00", "23:59"],
+      "Wednesday": ["00:00", "23:59"],
+      "Thursday":  ["00:00", "23:59"],
+      "Friday":    ["00:00", "22:00"],
+      "Saturday":  ["closed"]
+    }
+  },
+  "GBPUSD": {
+    "timezone": "UTC",
+    "session": {
+      "Sunday":    ["22:00", "23:59"],
+      "Monday":    ["00:00", "23:59"],
+      "Tuesday":   ["00:00", "23:59"],
+      "Wednesday": ["00:00", "23:59"],
+      "Thursday":  ["00:00", "23:59"],
+      "Friday":    ["00:00", "22:00"],
+      "Saturday":  ["closed"]
+    }
+  },
+  "USDJPY": {
+    "timezone": "UTC",
+    "session": {
+      "Sunday":    ["22:00", "23:59"],
+      "Monday":    ["00:00", "23:59"],
+      "Tuesday":   ["00:00", "23:59"],
+      "Wednesday": ["00:00", "23:59"],
+      "Thursday":  ["00:00", "23:59"],
+      "Friday":    ["00:00", "22:00"],
+      "Saturday":  ["closed"]
+    }
+  },
+  "AUDUSD": {
+    "timezone": "UTC",
+    "session": {
+      "Sunday":    ["22:00", "23:59"],
+      "Monday":    ["00:00", "23:59"],
+      "Tuesday":   ["00:00", "23:59"],
+      "Wednesday": ["00:00", "23:59"],
+      "Thursday":  ["00:00", "23:59"],
+      "Friday":    ["00:00", "22:00"],
+      "Saturday":  ["closed"]
+    }
+  },
+  "USDCAD": {
+    "timezone": "UTC",
+    "session": {
+      "Sunday":    ["22:00", "23:59"],
+      "Monday":    ["00:00", "23:59"],
+      "Tuesday":   ["00:00", "23:59"],
+      "Wednesday": ["00:00", "23:59"],
+      "Thursday":  ["00:00", "23:59"],
+      "Friday":    ["00:00", "22:00"],
+      "Saturday":  ["closed"]
+    }
+  }
+}
