@@ -1,0 +1,1 @@
+# Empty file to make trading_core a Python package
