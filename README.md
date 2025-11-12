@@ -29,4 +29,4 @@ Ein modulares Framework für Trading-Backtests und Live-Trading. Kernfeatures:
 
 
 
-**Lizenz:** MIT (frei nutzbar – füge via GitHub "Add file > License" hinzu).
+**Lizenz:** MIT .
